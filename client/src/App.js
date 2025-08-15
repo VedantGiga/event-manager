@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './hooks/useTheme';
 import Layout from './components/Layout';
-import OfflineIndicator from './components/OfflineIndicator';
+import TestConnection from './components/TestConnection';
 import EventList from './pages/EventList';
 import EventDetail from './pages/EventDetail';
 import Login from './pages/Login';
@@ -11,7 +11,6 @@ import Register from './pages/Register';
 import CreateEvent from './pages/CreateEvent';
 import MyBookings from './pages/MyBookings';
 import MyEvents from './pages/MyEvents';
-import { registerSW } from './utils/serviceWorker';
 import './styles/global.css';
 
 // Protected Route Component
@@ -33,13 +32,8 @@ const ProtectedRoute = ({ children, requireAuth = true, requireOrganizer = false
 
 // App Routes Component (needs to be inside AuthProvider)
 const AppRoutes = () => {
-  useEffect(() => {
-    registerSW();
-  }, []);
-
   return (
     <>
-      <OfflineIndicator />
       <Layout>
         <Routes>
           <Route path="/" element={<EventList />} />
@@ -73,6 +67,7 @@ const AppRoutes = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
+      <TestConnection />
     </>
   );
 };

@@ -2,17 +2,11 @@ import React, { useEffect } from 'react';
 import useAppStore from '../store/useAppStore';
 
 const OfflineIndicator = () => {
-  const { isOnline, setOnlineStatus, pendingActions, syncPendingActions } = useAppStore();
+  const { isOnline, setOnlineStatus, pendingActions } = useAppStore();
 
   useEffect(() => {
-    const handleOnline = () => {
-      setOnlineStatus(true);
-      syncPendingActions();
-    };
-
-    const handleOffline = () => {
-      setOnlineStatus(false);
-    };
+    const handleOnline = () => setOnlineStatus(true);
+    const handleOffline = () => setOnlineStatus(false);
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -21,7 +15,7 @@ const OfflineIndicator = () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, [setOnlineStatus, syncPendingActions]);
+  }, [setOnlineStatus]);
 
   if (isOnline && pendingActions.length === 0) return null;
 

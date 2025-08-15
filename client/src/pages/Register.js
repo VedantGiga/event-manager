@@ -171,7 +171,7 @@ const Register = () => {
           </div>
 
           <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-            Password must be at least 6 characters long and contain uppercase, lowercase, and number.
+            Password must be at least 6 characters long.
           </div>
 
           <button 

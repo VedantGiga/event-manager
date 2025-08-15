@@ -4,56 +4,68 @@ import EventCard from '../components/EventCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ErrorMessage from '../components/ErrorMessage';
 import useInfiniteScroll from '../hooks/useInfiniteScroll';
-import useAppStore from '../store/useAppStore';
 
 const EventList = () => {
-  const {
-    events,
-    eventsLoading: loading,
-    eventsError: error,
-    eventsPagination: pagination,
-    fetchEvents,
-    addEvents,
-    isOnline
-  } = useAppStore();
-  
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     search: '',
     category: '',
     city: '',
     limit: 12
   });
+  const [pagination, setPagination] = useState({});
   const [viewMode, setViewMode] = useState('pagination');
 
   const categories = ['conference', 'workshop', 'meetup', 'concert', 'sports', 'networking', 'seminar', 'other'];
 
-  const fetchEventsData = async (reset = true) => {
-    const queryParams = { ...filters };
-    if (!reset && pagination.nextCursor) {
-      queryParams.cursor = pagination.nextCursor;
-    }
-    
-    if (reset) {
-      await fetchEvents(queryParams);
-    } else {
-      try {
-        const response = await eventsAPI.getEvents(queryParams);
-        addEvents(response.data.data.events);
-      } catch (err) {
-        console.error('Failed to fetch more events:', err);
+  const fetchEvents = async (reset = true) => {
+    try {
+      if (reset) {
+        setLoading(true);
+        setError(null);
       }
+      
+      // Clean query parameters - remove empty values
+      const queryParams = {};
+      Object.keys(filters).forEach(key => {
+        if (filters[key] && filters[key].toString().trim()) {
+          queryParams[key] = filters[key];
+        }
+      });
+      
+      if (!reset && pagination.nextCursor) {
+        queryParams.cursor = pagination.nextCursor;
+      }
+      
+      const response = await eventsAPI.getEvents(queryParams);
+      const newEvents = response.data.data.events;
+      const newPagination = response.data.data.pagination;
+      
+      if (reset) {
+        setEvents(newEvents);
+      } else {
+        setEvents(prev => [...prev, ...newEvents]);
+      }
+      
+      setPagination(newPagination);
+    } catch (err) {
+      setError(err);
+    } finally {
+      if (reset) setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchEventsData(true);
-  }, [filters, fetchEvents]);
+    fetchEvents(true);
+  }, [filters]);
   
   const fetchMoreEvents = useCallback(async () => {
-    if (pagination.hasNextPage && !loading && isOnline) {
-      await fetchEventsData(false);
+    if (pagination.hasNextPage && !loading) {
+      await fetchEvents(false);
     }
-  }, [pagination.hasNextPage, loading, isOnline]);
+  }, [pagination.hasNextPage, loading]);
   
   const [isFetchingMore] = useInfiniteScroll(fetchMoreEvents);
 
@@ -66,12 +78,12 @@ const EventList = () => {
 
   const handlePageChange = (newPage) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    fetchEventsData(true);
+    fetchEvents(true);
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchEventsData(true);
+    fetchEvents(true);
   };
 
   return (
@@ -132,7 +144,7 @@ const EventList = () => {
         </div>
       </div>
 
-      {error && <ErrorMessage error={error} onRetry={() => fetchEventsData(true)} />}
+      {error && <ErrorMessage error={error} onRetry={() => fetchEvents(true)} />}
 
       {loading ? (
         <LoadingSpinner text="Loading events..." />
@@ -152,23 +164,7 @@ const EventList = () => {
                 marginBottom: '2rem'
               }}>
                 {events.map(event => (
-                  <div key={event._id} style={{ position: 'relative' }}>
-                    <EventCard event={event} />
-                    {!isOnline && (
-                      <div style={{
-                        position: 'absolute',
-                        top: '0.5rem',
-                        left: '0.5rem',
-                        backgroundColor: 'var(--warning)',
-                        color: 'white',
-                        padding: '0.25rem 0.5rem',
-                        borderRadius: '0.25rem',
-                        fontSize: '0.75rem'
-                      }}>
-                        📱 Cached
-                      </div>
-                    )}
-                  </div>
+                  <EventCard key={event._id} event={event} />
                 ))}
               </div>
 

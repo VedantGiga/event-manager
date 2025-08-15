@@ -26,9 +26,7 @@ const userValidation = {
       .withMessage('Please provide a valid email'),
     body('password')
       .isLength({ min: 6 })
-      .withMessage('Password must be at least 6 characters long')
-      .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-      .withMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number'),
+      .withMessage('Password must be at least 6 characters long'),
     body('firstName')
       .trim()
       .isLength({ min: 1, max: 50 })
@@ -196,31 +194,39 @@ const eventValidation = {
 
   list: [
     query('page')
-      .optional()
+      .optional({ checkFalsy: true })
       .isInt({ min: 1 })
       .withMessage('Page must be a positive integer'),
     query('limit')
-      .optional()
+      .optional({ checkFalsy: true })
       .isInt({ min: 1, max: 50 })
       .withMessage('Limit must be between 1 and 50'),
     query('cursor')
-      .optional()
+      .optional({ checkFalsy: true })
       .isLength({ min: 1 })
       .withMessage('Cursor must be a valid string'),
     query('category')
-      .optional()
+      .optional({ checkFalsy: true })
       .isIn(['conference', 'workshop', 'meetup', 'concert', 'sports', 'networking', 'seminar', 'other'])
       .withMessage('Please provide a valid category'),
+    query('city')
+      .optional({ checkFalsy: true })
+      .isLength({ min: 1 })
+      .withMessage('City must be a valid string'),
+    query('search')
+      .optional({ checkFalsy: true })
+      .isLength({ min: 1 })
+      .withMessage('Search must be a valid string'),
     query('startDate')
-      .optional()
+      .optional({ checkFalsy: true })
       .isISO8601()
       .withMessage('Please provide a valid start date'),
     query('endDate')
-      .optional()
+      .optional({ checkFalsy: true })
       .isISO8601()
       .withMessage('Please provide a valid end date'),
     query('sort')
-      .optional()
+      .optional({ checkFalsy: true })
       .isIn(['-dateTime.start', 'dateTime.start', '-createdAt', 'createdAt'])
       .withMessage('Invalid sort parameter'),
     handleValidationErrors

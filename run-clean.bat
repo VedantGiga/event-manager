@@ -1,0 +1,9 @@
+@echo off
+echo Cleaning database and starting fresh...
+echo.
+
+echo [1/2] Cleaning database...
+call npm run clean-db
+
+echo [2/2] Starting servers...
+call npm run dev

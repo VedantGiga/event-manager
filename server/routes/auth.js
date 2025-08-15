@@ -3,6 +3,7 @@ const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 const { protect } = require('../middleware/auth');
 const { userValidation } = require('../utils/validation');
+const { authLimiter } = require('../middleware/security');
 const logger = require('../utils/logger');
 
 const router = express.Router();
@@ -10,7 +11,7 @@ const router = express.Router();
 // @desc    Register user
 // @route   POST /api/auth/register
 // @access  Public
-router.post('/register', userValidation.register, async (req, res, next) => {
+router.post('/register', authLimiter, userValidation.register, async (req, res, next) => {
   try {
     const { email, password, firstName, lastName, phone, role } = req.body;
 
@@ -75,7 +76,7 @@ router.post('/register', userValidation.register, async (req, res, next) => {
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
-router.post('/login', userValidation.login, async (req, res, next) => {
+router.post('/login', authLimiter, userValidation.login, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 

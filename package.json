@@ -4,6 +4,8 @@
   "description": "Production-ready Event Management System with React frontend and Node.js backend",
   "main": "server/index.js",
   "scripts": {
+    "setup": "npm install && cd client && npm install && cd ..",
+    "clean-db": "node server/scripts/cleanDatabase.js",
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
     "server:dev": "nodemon server/index.js",
     "server:start": "node server/index.js",
@@ -41,7 +43,10 @@
     "nodemailer": "^6.9.7",
     "uuid": "^9.0.1",
     "moment": "^2.29.4",
-    "winston": "^3.11.0"
+    "winston": "^3.11.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "xss": "^1.0.14",
+    "hpp": "^0.2.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.2",

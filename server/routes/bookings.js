@@ -4,6 +4,7 @@ const Event = require('../models/Event');
 const AuditLog = require('../models/AuditLog');
 const { protect, authorize } = require('../middleware/auth');
 const { bookingValidation, paramValidation } = require('../utils/validation');
+const { bookingLimiter } = require('../middleware/security');
 const logger = require('../utils/logger');
 
 const router = express.Router();
@@ -11,7 +12,7 @@ const router = express.Router();
 // @desc    Create new booking
 // @route   POST /api/bookings
 // @access  Private
-router.post('/', protect, bookingValidation.create, async (req, res, next) => {
+router.post('/', protect, bookingLimiter, bookingValidation.create, async (req, res, next) => {
   try {
     const { eventId, quantity, attendeeInfo, ticketType } = req.body;
 

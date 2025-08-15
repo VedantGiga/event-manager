@@ -46,7 +46,9 @@ const AuditLogSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: function(v) {
-        return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/.test(v);
+        if (!v) return true; // Allow empty IP
+        // IPv4 or IPv6 (including ::1 for localhost)
+        return /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$|^::1$|^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/.test(v);
       },
       message: 'Please provide a valid IP address'
     }

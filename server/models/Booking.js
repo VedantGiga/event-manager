@@ -44,7 +44,6 @@ const BookingSchema = new mongoose.Schema({
   },
   bookingReference: {
     type: String,
-    unique: true,
     default: function() {
       return `BK-${Date.now()}-${uuidv4().substr(0, 8).toUpperCase()}`;
     }
