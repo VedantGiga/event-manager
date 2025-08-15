@@ -31,7 +31,6 @@ services:
   - type: web
     name: event-manager-frontend
     env: static
-    plan: free
     buildCommand: cd client && npm install && npm run build
     staticPublishPath: ./client/build
     envVars:
