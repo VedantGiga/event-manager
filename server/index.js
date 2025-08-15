@@ -80,34 +80,48 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('client/build'));
-  
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/build/index.html'));
+// Root endpoint for backend
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Event Management API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      api: '/api',
+      auth: '/api/auth',
+      events: '/api/events',
+      bookings: '/api/bookings'
+    }
   });
-}
+});
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
 // Environment validation
 const validateEnvironment = () => {
+  console.log('Validating environment variables...');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
+  console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+  console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+  
   const required = ['MONGODB_URI', 'JWT_SECRET'];
   const missing = required.filter(key => !process.env[key]);
   
   if (missing.length > 0) {
-    logger.error(`Missing required environment variables: ${missing.join(', ')}`);
+    console.error(`Missing required environment variables: ${missing.join(', ')}`);
+    console.error('Please set these environment variables in your Render dashboard');
     process.exit(1);
   }
   
   if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
-    logger.error('JWT_SECRET must be at least 32 characters long');
+    console.error('JWT_SECRET must be at least 32 characters long');
     process.exit(1);
   }
   
-  logger.info('Environment validation passed');
+  console.log('Environment validation passed');
 };
 
 // MongoDB connection
@@ -140,14 +154,17 @@ const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
+    console.log('Starting server...');
     validateEnvironment();
     await connectDB();
     
     app.listen(PORT, () => {
+      console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+      console.log('Security measures: Rate limiting, input sanitization, and password hashing active');
       logger.info(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-      logger.info('Security measures: Rate limiting, input sanitization, and password hashing active');
     });
   } catch (error) {
+    console.error('Failed to start server:', error);
     logger.error('Failed to start server:', error);
     process.exit(1);
   }
