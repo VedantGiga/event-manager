@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { ThemeProvider } from './hooks/useTheme';
 import Layout from './components/Layout';
-import TestConnection from './components/TestConnection';
+
 import EventList from './pages/EventList';
 import EventDetail from './pages/EventDetail';
 import Login from './pages/Login';
@@ -67,7 +67,6 @@ const AppRoutes = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Layout>
-      <TestConnection />
     </>
   );
 };
