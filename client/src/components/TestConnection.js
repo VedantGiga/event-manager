@@ -8,7 +8,11 @@ const TestConnection = () => {
   useEffect(() => {
     const testAPI = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/test');
+        const API_BASE_URL = process.env.REACT_APP_API_URL 
+          ? `${process.env.REACT_APP_API_URL}/api`
+          : 'http://localhost:5000/api';
+        
+        const response = await fetch(`${API_BASE_URL}/test`);
         if (response.ok) {
           setStatus('✅ Backend Connected');
         } else {
