@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: event-manager-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: event-manager-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRE
+        value: 24h
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: AUTH_RATE_LIMIT_MAX
+        value: 20
+      - key: AUTH_RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: CORS_ORIGIN
+        fromService:
+          type: web
+          name: event-manager-frontend
+          property: host
+      - key: LOG_LEVEL
+        value: info
+
+  - type: web
+    name: event-manager-frontend
+    env: static
+    plan: free
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: event-manager-backend
+          property: host
+
+databases:
+  - name: event-manager-db
+    databaseName: event-management
+    user: event-user
+    plan: free

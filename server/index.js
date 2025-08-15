@@ -2,8 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
+const path = require('path');
 require('dotenv').config();
 
 const logger = require('./utils/logger');
@@ -21,7 +20,6 @@ const app = express();
 
 // Security middleware
 app.use(helmet({ crossOriginEmbedderPolicy: false }));
-app.use(compression());
 
 // Apply security middleware
 app.use(securityMiddleware);
@@ -45,16 +43,11 @@ app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Logging middleware
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined', {
-    stream: {
-      write: (message) => logger.info(message.trim())
-    }
-  }));
-}
+// Request logging
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.path}`);
+  next();
+});
 
 // Health check endpoint
 app.get('/health', (req, res) => {
